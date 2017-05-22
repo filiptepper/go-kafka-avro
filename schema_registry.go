@@ -121,6 +121,10 @@ func NewCachedSchemaRegistryClientAuth(registryURL string, auth *KafkaAvroAuth) 
 	}
 }
 
+func HttpClient() *http.Client {
+	return &http.Client{}
+}
+
 func (this *CachedSchemaRegistryClient) Register(subject string, schema avro.Schema) (int32, error) {
 	var schemaIdMap map[avro.Schema]int32
 	var exists bool
@@ -146,7 +150,7 @@ func (this *CachedSchemaRegistryClient) Register(subject string, schema avro.Sch
 	request, err := this.newDefaultRequest("POST",
 		fmt.Sprintf(REGISTER_NEW_SCHEMA, subject),
 		strings.NewReader(fmt.Sprintf("{\"schema\": %s}", strconv.Quote(schema.String()))))
-	response, err := http.DefaultClient.Do(request)
+	response, err := HttpClient().Do(request)
 	if err != nil {
 		return 0, err
 	}
@@ -180,7 +184,7 @@ func (this *CachedSchemaRegistryClient) GetByID(id int32) (avro.Schema, error) {
 	if err != nil {
 		return nil, err
 	}
-	response, err := http.DefaultClient.Do(request)
+	response, err := HttpClient().Do(request)
 	if err != nil {
 		return nil, err
 	}
@@ -206,7 +210,7 @@ func (this *CachedSchemaRegistryClient) GetLatestSchemaMetadata(subject string) 
 	if err != nil {
 		return nil, err
 	}
-	response, err := http.DefaultClient.Do(request)
+	response, err := HttpClient().Do(request)
 	if err != nil {
 		return nil, err
 	}
@@ -239,7 +243,7 @@ func (this *CachedSchemaRegistryClient) GetVersion(subject string, schema avro.S
 	request, err := this.newDefaultRequest("POST",
 		fmt.Sprintf(CHECK_IS_REGISTERED, subject),
 		strings.NewReader(fmt.Sprintf("{\"schema\": %s}", strconv.Quote(schema.String()))))
-	response, err := http.DefaultClient.Do(request)
+	response, err := HttpClient().Do(request)
 	if err != nil {
 		return 0, err
 	}
